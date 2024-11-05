@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { Link } from "react-router-dom";
+import uploadFile from "../utils/uploadFile";
 
 const RegisterPage = () => {
   const [data, setData] = useState({
@@ -22,10 +23,17 @@ const RegisterPage = () => {
     });
   };
 
-  const handleUploadPhoto = (e) => {
+  const handleUploadPhoto = async (e) => {
     const file = e.target.files[0];
 
+    const uploadPhoto = await uploadFile(file);
+    console.log(uploadPhoto);
+
     setUploadPhoto(file);
+
+    setData((prev) => {
+      return { ...prev, profile_pic: uploadPhoto?.url };
+    });
   };
 
   const handleClearUploadPhoto = (e) => {
@@ -36,12 +44,14 @@ const RegisterPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const URL = `${process.env.REACT_APP_BACKEND_URL}/api/register`;
     console.log(data);
   };
 
   return (
     <div className="mt-5">
-      <div className="bg-white w-full max-w-sm rounded overflow-hidden p-4 mx-auto">
+      <div className="bg-white w-full max-w-md rounded overflow-hidden p-4 mx-auto">
         <h3>Welcome to Chat App!</h3>
 
         <form className="grid gap-4 mt-5" onSubmit={handleSubmit}>
