@@ -34,7 +34,9 @@ const CheckEmailPage = () => {
         setData({
           email: "",
         });
-        navigate("/password");
+        navigate("/password", {
+          state: res?.data.data,
+        });
       }
     } catch (error) {
       toast.error(error?.response?.data?.message);
