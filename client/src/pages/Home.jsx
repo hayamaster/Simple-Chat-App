@@ -3,6 +3,7 @@ import { useEffect, useCallback } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, setUser } from "../redux/userSlice";
+import Sidebar from "../components/Sidebar";
 
 const Home = () => {
   const user = useSelector((state) => state.user);
@@ -32,8 +33,10 @@ const Home = () => {
   }, [fetchUserDetails]);
 
   return (
-    <div className="text-2xl">
-      <h1>Home</h1>
+    <div className="grid lg:grid-cols-[300px,1fr] h-screen max-h-screen">
+      <section className="bg-white">
+        <Sidebar />
+      </section>
 
       <section>
         <Outlet />

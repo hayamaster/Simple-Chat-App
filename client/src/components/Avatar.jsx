@@ -53,7 +53,12 @@ const Avatar = ({ name, imageUrl, w, h }) => {
           {avatarName}
         </div>
       ) : (
-        <PiUserCircle size={80} />
+        <PiUserCircle
+          style={{
+            width: w,
+            height: h,
+          }}
+        />
       )}
     </div>
   );
