@@ -39,7 +39,12 @@ const Sidebar = () => {
             title={`${user?.name}`}
             onClick={() => setEditUserOpen(true)}
           >
-            <Avatar w={40} h={40} name={user.name} />
+            <Avatar
+              w={40}
+              h={40}
+              name={user.name}
+              imageUrl={user.profile_pic}
+            />
           </button>
           <button
             title="logout"
@@ -53,7 +58,7 @@ const Sidebar = () => {
       </div>
 
       {editUserOpen && (
-        <EditUserDetails onClose={() => setEditUserOpen(false)} data={user} />
+        <EditUserDetails onClose={() => setEditUserOpen(false)} user={user} />
       )}
     </div>
   );
