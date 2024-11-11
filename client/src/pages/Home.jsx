@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout, setUser } from "../redux/userSlice";
 import Sidebar from "../components/Sidebar";
 import logo from "../assets/chat_app_logo.png";
+import io from "socket.io-client";
 
 const Home = () => {
   const user = useSelector((state) => state.user);
@@ -34,6 +35,23 @@ const Home = () => {
   useEffect(() => {
     fetchUserDetails();
   }, [fetchUserDetails]);
+
+  /** socket connection */
+  useEffect(() => {
+    const socketConnection = io(process.env.REACT_APP_BACKEND_URL, {
+      auth: {
+        token: localStorage.getItem("token"),
+      },
+    });
+
+    socketConnection.on("onlineUser", (data) => {
+      console.log("online user", data);
+    });
+
+    return () => {
+      socketConnection.disconnect();
+    };
+  }, []);
 
   return (
     <div className="grid lg:grid-cols-[300px,1fr] h-screen max-h-screen">
