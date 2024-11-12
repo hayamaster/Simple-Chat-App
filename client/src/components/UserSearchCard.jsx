@@ -8,7 +8,13 @@ const UserSearchCard = ({ user }) => {
       className="flex items-center gap-3 p-2 lg:p-4 border border-transparent border-b-slate-200 hover:border-secondary rounded cursor-pointer"
     >
       <div>
-        <Avatar w={50} h={50} name={user?.name} imageUrl={user?.profile_pic} />
+        <Avatar
+          w={50}
+          h={50}
+          name={user?.name}
+          imageUrl={user?.profile_pic}
+          userId={user?._id}
+        />
       </div>
       <div>
         <div className="font-semibold text-ellipsis line-clamp-1">

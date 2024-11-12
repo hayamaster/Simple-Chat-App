@@ -1,7 +1,9 @@
 import { PiUserCircle } from "react-icons/pi";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
-const Avatar = ({ name, imageUrl, w, h }) => {
+const Avatar = ({ userId, name, imageUrl, w, h }) => {
+  const onlineUser = useSelector((state) => state?.user?.onlineUser);
   const [randomColor, setRandomColor] = useState("");
   let avatarName = "";
 
@@ -32,33 +34,40 @@ const Avatar = ({ name, imageUrl, w, h }) => {
     setRandomColor(bgColor[Math.floor(Math.random() * bgColor.length)]);
   }, []);
 
+  const isOnline = onlineUser?.includes(userId);
+
   return (
-    <div
-      className={`text-slate-800 overflow-hidden rounded-full font-bold`}
-      style={{ width: w + "px", height: h + "px" }}
-    >
-      {imageUrl ? (
-        <img
-          src={imageUrl}
-          width={w}
-          height={h}
-          alt={name}
-          className="overflow-hidden rounded-full"
-        />
-      ) : name ? (
-        <div
-          style={{ width: w + "px", height: h + "px" }}
-          className={`overflow-hidden rounded-full text-lg flex justify-center items-center ${randomColor}`}
-        >
-          {avatarName}
-        </div>
-      ) : (
-        <PiUserCircle
-          style={{
-            width: w,
-            height: h,
-          }}
-        />
+    <div className="rounded-full relative">
+      <div
+        className={`text-slate-800 overflow-hidden rounded-full font-bold`}
+        style={{ width: w + "px", height: h + "px" }}
+      >
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            width={w}
+            height={h}
+            alt={name}
+            className="overflow-hidden rounded-full"
+          />
+        ) : name ? (
+          <div
+            style={{ width: w + "px", height: h + "px" }}
+            className={`overflow-hidden rounded-full text-lg flex justify-center items-center ${randomColor}`}
+          >
+            {avatarName}
+          </div>
+        ) : (
+          <PiUserCircle
+            style={{
+              width: w,
+              height: h,
+            }}
+          />
+        )}
+      </div>
+      {isOnline && (
+        <div className="bg-green-600 p-1 absolute bottom-2 -right-1 z-10 rounded-full"></div>
       )}
     </div>
   );
