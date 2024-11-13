@@ -2,7 +2,12 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useCallback } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, setOnlineUser, setUser } from "../redux/userSlice";
+import {
+  logout,
+  setOnlineUser,
+  setUser,
+  setSocketConnection,
+} from "../redux/userSlice";
 import Sidebar from "../components/Sidebar";
 import logo from "../assets/chat_app_logo.png";
 import io from "socket.io-client";
@@ -49,10 +54,12 @@ const Home = () => {
       dispatch(setOnlineUser(data));
     });
 
+    dispatch(setSocketConnection(socketConnection));
+
     return () => {
       socketConnection.disconnect();
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className="grid lg:grid-cols-[300px,1fr] h-screen max-h-screen">
