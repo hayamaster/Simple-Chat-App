@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Avatar from "./Avatar";
 import { HiDotsVertical } from "react-icons/hi";
-import { FaAngleLeft } from "react-icons/fa";
+import { FaAngleLeft, FaPlus } from "react-icons/fa";
+import { FaImage, FaVideo } from "react-icons/fa6";
+import uploadFile from "../utils/uploadFile";
+import { IoClose } from "react-icons/io5";
+import Loading from "./Loading";
 
 const MessagePage = () => {
   const params = useParams();
@@ -18,6 +22,67 @@ const MessagePage = () => {
     online: false,
     _id: "",
   });
+  const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
+  const [message, setMessage] = useState({
+    text: "",
+    imageUrl: "",
+    videoUrl: "",
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleUploadImageVideoOpen = () => {
+    setOpenImageVideoUpload((prev) => !prev);
+  };
+
+  const handleUploadImage = async (e) => {
+    const file = e.target.files[0];
+
+    setLoading(true);
+    const uploadPhoto = await uploadFile(file);
+    setLoading(false);
+    setOpenImageVideoUpload(false);
+
+    setMessage((prev) => {
+      return {
+        ...prev,
+        imageUrl: uploadPhoto?.url,
+      };
+    });
+  };
+
+  const handleClearUploadImage = () => {
+    setMessage((prev) => {
+      return {
+        ...prev,
+        imageUrl: "",
+      };
+    });
+  };
+
+  const handleUploadVideo = async (e) => {
+    const file = e.target.files[0];
+
+    setLoading(true);
+    const uploadVideo = await uploadFile(file);
+    setLoading(false);
+    setOpenImageVideoUpload(false);
+
+    setMessage((prev) => {
+      return {
+        ...prev,
+        videoUrl: uploadVideo?.url,
+      };
+    });
+  };
+
+  const handleClearUploadVideo = () => {
+    setMessage((prev) => {
+      return {
+        ...prev,
+        videoUrl: "",
+      };
+    });
+  };
 
   useEffect(() => {
     if (socketConnection) {
@@ -65,6 +130,100 @@ const MessagePage = () => {
           </button>
         </div>
       </header>
+
+      <section className="h-[calc(100vh-128px)] overflow-x-hidden overflow-y-scroll relative">
+        {message?.imageUrl && (
+          <div className="w-full h-full bg-slate-700 bg-opacity-30 flex items-center justify-center rounded overflow-hidden">
+            <div
+              className="w-fit p-2 absolute top-0 right-0 cursor-pointer hover:text-red-600"
+              onClick={handleClearUploadImage}
+            >
+              <IoClose size={30} />
+            </div>
+            <div className="bg-white p-3">
+              <img
+                src={message.imageUrl}
+                alt="uploadImage"
+                className="aspect-square w-full h-full max-w-sm m-2 object-scale-down"
+              />
+            </div>
+          </div>
+        )}
+        {message?.videoUrl && (
+          <div className="w-full h-full bg-slate-700 bg-opacity-30 flex items-center justify-center rounded overflow-hidden">
+            <div
+              className="w-fit p-2 absolute top-0 right-0 cursor-pointer hover:text-red-600"
+              onClick={handleClearUploadVideo}
+            >
+              <IoClose size={30} />
+            </div>
+            <div className="bg-white p-3">
+              <video
+                src={message.videoUrl}
+                className="aspect-square w-full h-full max-w-sm m-2 object-scale-down"
+                controls
+                muted
+                autoPlay
+              />
+            </div>
+          </div>
+        )}
+        {loading && (
+          <div className="w-full h-full flex justify-center items-center">
+            <Loading />
+          </div>
+        )}
+        Show all message
+      </section>
+
+      <section className="h-16 bg-white flex items-center px-4">
+        <div className="relative">
+          <button
+            onClick={handleUploadImageVideoOpen}
+            className="flex items-center justify-center w-11 h-11 rounded-full hover:bg-secondary hover:text-white"
+          >
+            <FaPlus size={20} />
+          </button>
+
+          {openImageVideoUpload && (
+            <div className="bg-white shadow rounded absolute bottom-14 w-36 p-2">
+              <form>
+                <label
+                  htmlFor="uploadImage"
+                  className="flex items-center p-2 px-3 gap-3 hover:bg-slate-200 cursor-pointer"
+                >
+                  <div className="text-secondary">
+                    <FaImage size={18} />
+                  </div>
+                  <p>Image</p>
+                </label>
+                <label
+                  htmlFor="uploadVideo"
+                  className="flex items-center p-2 px-3 gap-3 hover:bg-slate-200 cursor-pointer"
+                >
+                  <div className="text-purple-500">
+                    <FaVideo size={18} />
+                  </div>
+                  <p>Video</p>
+                </label>
+
+                <input
+                  type="file"
+                  id="uploadImage"
+                  onChange={handleUploadImage}
+                  className="hidden"
+                />
+                <input
+                  type="file"
+                  id="uploadVideo"
+                  onChange={handleUploadVideo}
+                  className="hidden"
+                />
+              </form>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 };
