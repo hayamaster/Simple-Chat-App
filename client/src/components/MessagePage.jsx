@@ -8,6 +8,7 @@ import { FaImage, FaVideo } from "react-icons/fa6";
 import uploadFile from "../utils/uploadFile";
 import { IoClose } from "react-icons/io5";
 import Loading from "./Loading";
+import background from "../assets/backgroundImage.jpg";
 
 const MessagePage = () => {
   const params = useParams();
@@ -95,7 +96,10 @@ const MessagePage = () => {
   }, [socketConnection, params?.userId, user]);
 
   return (
-    <div>
+    <div
+      style={{ backgroundImage: `url(${background})` }}
+      className="bg-no-repeat bg-cover"
+    >
       <header className="sticky top-0 h-16 bg-white flex justify-between items-center px-4">
         <div className="flex items-center gap-4">
           <Link to="/" className="lg:hidden">
@@ -131,7 +135,7 @@ const MessagePage = () => {
         </div>
       </header>
 
-      <section className="h-[calc(100vh-128px)] overflow-x-hidden overflow-y-scroll relative">
+      <section className="h-[calc(100vh-128px)] overflow-x-hidden overflow-y-scroll relative bg-slate-200 bg-opacity-50">
         {message?.imageUrl && (
           <div className="w-full h-full bg-slate-700 bg-opacity-30 flex items-center justify-center rounded overflow-hidden">
             <div
@@ -176,6 +180,7 @@ const MessagePage = () => {
         Show all message
       </section>
 
+      {/** send message */}
       <section className="h-16 bg-white flex items-center px-4">
         <div className="relative">
           <button
