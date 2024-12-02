@@ -3,6 +3,10 @@ const { Server } = require("socket.io");
 const http = require("http");
 const getUserDetailsFromToken = require("../helpers/getUserDetailsFromToken");
 const UserModel = require("../models/UserModel");
+const {
+  ConversationModel,
+  MessageModel,
+} = require("../models/ConversationModel");
 
 const app = express();
 
@@ -28,7 +32,7 @@ io.on("connection", async (socket) => {
   const user = await getUserDetailsFromToken(token);
 
   // create a room for the user
-  socket.join(user?._id);
+  socket.join(user?._id.toString());
   onlineUser.add(user?._id?.toString());
 
   io.emit("onlineUser", Array.from(onlineUser));
@@ -46,6 +50,54 @@ io.on("connection", async (socket) => {
 
     socket.emit("message-user", payload);
     console.log("user-id", userId);
+  });
+
+  // new message
+  socket.on("new message", async (data) => {
+    // check conversation is available both user
+    const conversation = await ConversationModel.findOne({
+      $or: [
+        { sender: data?.sender, receiver: data?.receiver },
+        { sender: data?.receiver, receiver: data?.sender },
+      ],
+    });
+
+    if (!conversation) {
+      const createConversation = new ConversationModel({
+        sender: data?.sender,
+        receiver: data?.receiver,
+      });
+
+      await createConversation.save();
+    }
+
+    const message = new MessageModel({
+      text: data?.text,
+      imageUrl: data?.imageUrl,
+      videoUrl: data?.videoUrl,
+      msgByUserId: data?.msgByUserId,
+    });
+
+    const saveMessage = await message.save();
+
+    await ConversationModel.updateOne(
+      {
+        _id: conversation?._id,
+      },
+      { $push: { messages: saveMessage?._id } }
+    );
+
+    const getConversationMessage = await ConversationModel.findOne({
+      $or: [
+        { sender: data?.sender, receiver: data?.receiver },
+        { sender: data?.receiver, receiver: data?.sender },
+      ],
+    })
+      .populate("messages")
+      .sort({ updateAt: -1 });
+
+    io.to(data?.sender).emit("message", getConversationMessage.messages);
+    io.to(data?.receiver).emit("message", getConversationMessage.messages);
   });
 
   // disconnect

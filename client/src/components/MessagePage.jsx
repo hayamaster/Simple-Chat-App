@@ -9,6 +9,7 @@ import uploadFile from "../utils/uploadFile";
 import { IoClose } from "react-icons/io5";
 import Loading from "./Loading";
 import background from "../assets/backgroundImage.jpg";
+import { IoMdSend } from "react-icons/io";
 
 const MessagePage = () => {
   const params = useParams();
@@ -30,6 +31,20 @@ const MessagePage = () => {
     videoUrl: "",
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (socketConnection) {
+      socketConnection.emit("message-page", params.userId);
+
+      socketConnection.on("message-user", (data) => {
+        setDataUser(data);
+      });
+
+      socketConnection.on("message", (data) => {
+        console.log(data);
+      });
+    }
+  }, [socketConnection, params?.userId, user]);
 
   const handleUploadImageVideoOpen = () => {
     setOpenImageVideoUpload((prev) => !prev);
@@ -85,15 +100,38 @@ const MessagePage = () => {
     });
   };
 
-  useEffect(() => {
-    if (socketConnection) {
-      socketConnection.emit("message-page", params.userId);
+  const handleOnChange = (e) => {
+    setMessage((prev) => {
+      return {
+        ...prev,
+        text: e.target.value,
+      };
+    });
+  };
 
-      socketConnection.on("message-user", (data) => {
-        setDataUser(data);
-      });
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    console.log(message);
+
+    if (message.text || message.imageUrl || message.videoUrl) {
+      if (socketConnection) {
+        socketConnection.emit("new message", {
+          sender: user?._id,
+          receiver: params.userId,
+          text: message.text,
+          imageUrl: message.imageUrl,
+          videoUrl: message.videoUrl,
+          msgByUserId: user?._id,
+        });
+
+        setMessage({
+          text: "",
+          imageUrl: "",
+          videoUrl: "",
+        });
+      }
     }
-  }, [socketConnection, params?.userId, user]);
+  };
 
   return (
     <div
@@ -228,6 +266,20 @@ const MessagePage = () => {
             </div>
           )}
         </div>
+
+        {/** input box */}
+        <form className="h-full w-full flex gap-2" onSubmit={handleSendMessage}>
+          <input
+            type="text"
+            placeholder="Type your message..."
+            className="py-1 px-4 outline-none w-full h-full"
+            value={message.text}
+            onChange={handleOnChange}
+          />
+          <button className="text-secondary hover:text-primary">
+            <IoMdSend size={28} />
+          </button>
+        </form>
       </section>
     </div>
   );
