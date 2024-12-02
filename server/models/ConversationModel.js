@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema(
   {
-    test: {
+    text: {
       type: String,
       default: "",
     },
@@ -17,6 +17,11 @@ const messageSchema = new mongoose.Schema(
     seen: {
       type: Boolean,
       default: false,
+    },
+    msgByUserId: {
+      type: mongoose.Schema.ObjectId,
+      required: true,
+      ref: "User",
     },
   },
   {
@@ -36,7 +41,7 @@ const conversationSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
-    message: [
+    messages: [
       {
         type: mongoose.Schema.ObjectId,
         ref: "Message",
