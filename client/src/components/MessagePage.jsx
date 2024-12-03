@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import Avatar from "./Avatar";
 import { HiDotsVertical } from "react-icons/hi";
@@ -33,6 +33,16 @@ const MessagePage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [allMessage, setAllMessage] = useState([]);
+  const currentMessage = useRef(null);
+
+  useEffect(() => {
+    if (currentMessage.current) {
+      currentMessage.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
+  }, [allMessage]);
 
   useEffect(() => {
     if (socketConnection) {
@@ -219,12 +229,13 @@ const MessagePage = () => {
         )}
 
         {/** all message show */}
-        <div className="flex flex-col gap-2 py-2">
+        <div className="flex flex-col gap-2 py-2 mx-2" ref={currentMessage}>
           {allMessage?.map((msg, index) => {
             return (
               <div
+                key={index}
                 className={`bg-white p-1 rounded w-fit ${
-                  user._id === msg.msgByUserId && "ml-auto"
+                  user._id === msg.msgByUserId && "ml-auto bg-teal-100"
                 }`}
               >
                 <p className="px-2">{msg.text}</p>
