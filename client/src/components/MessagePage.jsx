@@ -10,6 +10,7 @@ import { IoClose } from "react-icons/io5";
 import Loading from "./Loading";
 import background from "../assets/backgroundImage.jpg";
 import { IoMdSend } from "react-icons/io";
+import moment from "moment";
 
 const MessagePage = () => {
   const params = useParams();
@@ -31,6 +32,7 @@ const MessagePage = () => {
     videoUrl: "",
   });
   const [loading, setLoading] = useState(false);
+  const [allMessage, setAllMessage] = useState([]);
 
   useEffect(() => {
     if (socketConnection) {
@@ -41,7 +43,7 @@ const MessagePage = () => {
       });
 
       socketConnection.on("message", (data) => {
-        console.log(data);
+        setAllMessage(data);
       });
     }
   }, [socketConnection, params?.userId, user]);
@@ -215,7 +217,24 @@ const MessagePage = () => {
             <Loading />
           </div>
         )}
-        Show all message
+
+        {/** all message show */}
+        <div className="flex flex-col gap-2 py-2">
+          {allMessage?.map((msg, index) => {
+            return (
+              <div
+                className={`bg-white p-1 rounded w-fit ${
+                  user._id === msg.msgByUserId && "ml-auto"
+                }`}
+              >
+                <p className="px-2">{msg.text}</p>
+                <p className="text-xs ml-auto w-fit">
+                  {moment(msg.createdAt).format("hh:mm")}
+                </p>
+              </div>
+            );
+          })}
+        </div>
       </section>
 
       {/** send message */}
