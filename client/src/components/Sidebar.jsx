@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import EditUserDetails from "./EditUserDetails";
 import { FiArrowUpLeft } from "react-icons/fi";
 import SearchUser from "./SearchUser";
+import { FaImage, FaVideo } from "react-icons/fa6";
 
 const Sidebar = () => {
   const user = useSelector((state) => state?.user);
@@ -115,9 +116,12 @@ const Sidebar = () => {
             </div>
           )}
 
-          {allUser.map((conv, index) => {
+          {allUser.map((conv) => {
             return (
-              <div key={conv._id} className="flex items-center gap-2">
+              <div
+                key={conv._id}
+                className="flex items-center gap-2 py-3 px-2 border border-transparent hover:border-secondary rounded hover:bg-slate-100 cursor-pointer"
+              >
                 <div>
                   <Avatar
                     imageUrl={conv?.userDetails?.profile_pic}
@@ -127,13 +131,34 @@ const Sidebar = () => {
                   />
                 </div>
                 <div>
-                  <h3 className="text-ellipsis line-clamp-1">
+                  <h3 className="text-ellipsis line-clamp-1 font-semibold">
                     {conv?.userDetails?.name}
                   </h3>
-                  <div>
+                  <div className="text-slate-500 text-xs flex items-center gap-1">
+                    <div>
+                      {conv?.lastMsg?.imageUrl && (
+                        <div className="flex items-center gap-1">
+                          <span>
+                            <FaImage />
+                          </span>
+                          {!conv?.lastMsg?.text && <span>Image</span>}
+                        </div>
+                      )}
+                      {conv?.lastMsg?.videoUrl && (
+                        <div className="flex items-center gap-1">
+                          <span>
+                            <FaVideo />
+                          </span>
+                          {!conv?.lastMsg?.text && <span>Video</span>}
+                        </div>
+                      )}
+                    </div>
                     <p>{conv?.lastMsg?.text}</p>
                   </div>
                 </div>
+                <p className="text-xs w-6 h-6 flex items-center justify-center p-1 ml-auto bg-secondary text-white font-semibold rounded-full">
+                  {conv?.unseenMsg}
+                </p>
               </div>
             );
           })}
