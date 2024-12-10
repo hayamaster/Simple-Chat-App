@@ -7,6 +7,7 @@ const {
   ConversationModel,
   MessageModel,
 } = require("../models/ConversationModel");
+const getConversation = require("../helpers/getConversation");
 
 const app = express();
 
@@ -115,32 +116,9 @@ io.on("connection", async (socket) => {
   socket.on("sidebar", async (currentUserId) => {
     console.log("current user", currentUserId);
 
-    if (currentUserId) {
-      const currentUserConversation = await ConversationModel.find({
-        $or: [{ sender: currentUserId }, { receiver: currentUserId }],
-      })
-        .sort({ updateAt: -1 })
-        .populate("messages")
-        .populate("sender")
-        .populate("receiver");
+    const conversation = await getConversation(currentUserId);
 
-      const conversation = currentUserConversation.map((conv) => {
-        const countUnseenMsg = conv?.messages.reduce(
-          (acc, cur) => (acc += cur.seen ? 0 : 1),
-          0
-        );
-
-        return {
-          _id: conv?._id,
-          sender: conv?.sender,
-          receiver: conv?.receiver,
-          unseenMsg: countUnseenMsg,
-          lastMsg: conv?.messages[conv?.messages.length - 1],
-        };
-      });
-
-      socket.emit("conversation", conversation);
-    }
+    socket.emit("conversation", conversation);
   });
 
   // disconnect
